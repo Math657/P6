@@ -51,6 +51,60 @@ exports.deleteSauce = (req, res) => {
     })
 }
 
-exports.likeSauce = (req, res) => {
-    Sauce.findOne({_id: req.params.id})
+exports.likeSauce = (req, res) => { 
+    const likeStatus = req.params.like
+    Sauce.findOne(req.params.id)
+    .then(sauce => {
+        User.findOne({_id: req.params.userId})  // inutile de chercher l'user car on l'a déjà
+        .then(user => {  // inutile
+            if (sauce.usersLiked.include(user)) {
+                switch (likeStatus) {  // revoir la logique (si on a 1 ou -1, alors...)
+                    case 1:
+                        sauce.usersLiked -= user // indexof c'est un tableau pas de soustraction sur tableau
+                        sauce.likes -= 1
+                        likeStatus = 0
+                    break
+
+                    case -1:
+                        sauce.usersLiked -= user
+                        sauce.likes -= 1
+                        sauce.usersDisliked += user
+                        sauce.dislikes += 1
+                    break
+                }
+            }
+
+            if (sauce.usersDisliked.include(user)) {
+                switch (likeStatus) {
+                    case 1:
+                        sauce.usersDisliked -= user
+                        sauce.dislikes -= 1
+                        sauce.usersLiked += user
+                        sauce.likes += 1
+                    break
+
+                    case -1:
+                        sauce.usersDisliked -= user
+                        sauce.dislikes -= 1
+                        likeStatus = 0
+                    break
+                }
+            }
+
+            else {
+                switch (likeStatus) {
+                    case 1:
+                        sauce.usersLiked += user
+                        sauce.likes += 1
+                    break
+
+                    case -1: 
+                        sauce.usersDisliked += user
+                        sauce.dislikes += 1
+                    break
+                }
+            }
+        })
+        .catch(error => res.status(503).json(error))
+    }) 
 }

@@ -13,3 +13,4 @@ module.exports = (req, res, next) => {
     }
     catch (error) { res.status(401).json({ error: error | 'Requête non authentifiée !'})}
 }
+// cookie => stocker ce code là dedans / voir avec postmal le cookie dans le header(de la réponse)
