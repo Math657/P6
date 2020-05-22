@@ -70,7 +70,6 @@ exports.likeSauce = (req, res) => {
                     const arrLiked = sauce.usersLiked
                     const i = arrLiked.indexOf(user)
                     arrLiked.splice(i, 1)
-                    //sauce.usersLiked.filter(e => e !== user)
                     sauce.likes --
             }
 
@@ -78,69 +77,21 @@ exports.likeSauce = (req, res) => {
                     const arrDisliked = sauce.usersDisliked
                     const i = arrDisliked.indexOf(user)
                     arrDisliked.splice(i, 1)
-                    //sauce.usersDisliked.filter(e => e !== user)
                     sauce.dislikes --
             }
         }
-    sauce.save()
-    .then(() => res.status(201).json({ message: 'Statut like/dislike définit !'}))
-    .catch(error => res.status(503).json({error}))   
+
+        if (likeStatus == 1 && sauce.usersDisliked.includes(user)) {
+                return res.status(503).json({message: 'Veuillez svp disliker avant daimer!'})
+        }
+
+        if (likeStatus == -1 && sauce.usersLiked.includes(user)) {
+                return res.status(503).json({message: 'Veuillez svp ne plus liker avant de disliker!'})
+        }
+        sauce.save()
+        .then(() => res.status(201).json({ message: 'Statut like/dislike définit !'}))
+        .catch(error => res.status(503).json({error}))   
     }) 
     .catch(error => res.status(503).json(error)
     )
 }
-
-
-
-
-
-
-
-
-// if (sauce.usersLiked.include(user)) {
-            //     switch (likeStatus) {  // revoir la logique (si on a 1 ou -1, alors...)
-            //         case 1:
-            //             sauce.usersLiked.filter(e => e !== user) // indexof c'est un tableau pas de soustraction sur tableau
-            //             sauce.likes -= 1
-            //             likeStatus = 0
-            //         break
-
-            //         case -1:
-            //             sauce.usersLiked -= user
-            //             sauce.likes -= 1
-            //             sauce.usersDisliked += user
-            //             sauce.dislikes += 1
-            //         break
-            //     }
-            // }
-
-            // if (sauce.usersDisliked.include(user)) {
-            //     switch (likeStatus) {
-            //         case 1:
-            //             sauce.usersDisliked -= user
-            //             sauce.dislikes -= 1
-            //             sauce.usersLiked += user
-            //             sauce.likes += 1
-            //         break
-
-            //         case -1:
-            //             sauce.usersDisliked -= user
-            //             sauce.dislikes -= 1
-            //             likeStatus = 0
-            //         break
-            //     }
-            // }
-
-            // else {
-            //     switch (likeStatus) {
-            //         case 1:
-            //             sauce.usersLiked += user
-            //             sauce.likes += 1
-            //         break
-
-            //         case -1: 
-            //             sauce.usersDisliked += user
-            //             sauce.dislikes += 1
-            //         break
-            //     }
-            // }  
